@@ -89,7 +89,11 @@ class ClusterManager(object):
             time.sleep(interval)
 
 if __name__ == "__main__":
-    cm = ClusterManager(["localhost", "lotus2"])
+    nodes = []
+    with open('nodes', 'r') as fin:
+        for line in fin:
+            nodes.append(line.strip())
+    cm = ClusterManager(nodes)
     # import atexit
     # atexit.register(cm.printSummary, None, None)
     import signal
