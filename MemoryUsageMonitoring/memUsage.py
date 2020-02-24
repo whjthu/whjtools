@@ -35,8 +35,14 @@ class MemInfo(object):
 
     def updateMemInfo(self, init = False):
         stream = os.popen(self.cmd)
-        output = stream.read()
-        memInfo = list(map(int, output.split('\n')[1].split()[1:]))
+        output = stream.read().strip()
+        outarr  = output.split('\n')
+        if len(outarr) != 3:
+            return
+        infoarr = outarr[1].strip().split()
+        if len(infoarr) != 7:
+            return
+        memInfo = list(map(int, infoarr[1:]))
         self.total = memInfo[0]
         self.used.update(memInfo[1])
         self.free.update(memInfo[2])
@@ -71,16 +77,17 @@ class ClusterManager(object):
         while value > 1024:
             value = value / 1024
             idx += 1
-        return str(value) + units[idx]
+        return '%.2f' % (value) + units[idx]
 
     def printSummary(self, *args):
         maxMemUsage = {}
         for node in self.nodes:
             maxMemUsage[node] = self.humanReadable(self.mems[node].maxusage)
         print(maxMemUsage)
-        with open('log', 'w') as fout:
+        with open('mem.log', 'w') as fout:
             fout.write(str(maxMemUsage))
             fout.write('\n')
+        exit()
 
     def collect(self, interval = 1):
         while True:
